@@ -23,23 +23,41 @@ ui <- shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       textInput(inputId = "start",
-                   label = "start date, format = YYYYMMDDHHMM",
-                   value = "201711290000"),
+                 label = "start date, format = YYYYMMDDHHMM",
+                 value = "201711290000"),
       textInput(inputId = "end",
-                   label = "end date, format = YYYYMMDDHHMM",
-                   value = "201711291200"),
+                label = "end date, format = YYYYMMDDHHMM",
+                value = "201711291200"),
+      textInput(inputId = "address",
+                label = "City, State",
+                value = "Oakland, California"),
+      textInput(inputId = "radius",
+                label = "radius in miles for station search",
+                value = 50),
+      actionButton(inputId = "stationdata",
+                label = "Click to get stations nearby"),
       textInput(inputId = "station",
-                   label = "Staton ID",
-                   value = "C5988"),
+                label = "STID (input from table or known station id)",
+                value = "C5988"),
+   
+      
       actionButton(inputId = "clicks",
                    label = "Click to get data"),
-      downloadButton('down', 'Download data')
+      selectInput('ycol', 'Y Variable', "", selected = ""),
+      selectInput('xcol', 'X Variable', "", selected = ""),
+      numericInput(inputId = "date_breaks",
+                   label = "Date breaks for plot",
+                   value = 250),
+      actionButton(inputId = "plot",
+                   label = "Click to plot"),
+      downloadLink('down', 'Download')
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
       tableOutput("table"),
-       plotOutput("distPlot")
+      tableOutput("table2"),
+       plotlyOutput("tempts")
     )
   )
 ))

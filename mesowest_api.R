@@ -24,6 +24,7 @@ mesowest_api <- function(path) {
     class = "mesowest_api"
   )
 }
+
 print.mesowest_api <- function(x, ...) {
   cat("<mesowest ", x$path, ">\n", sep = "")
   str(x$content)
