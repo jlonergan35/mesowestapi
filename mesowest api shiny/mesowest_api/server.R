@@ -8,6 +8,7 @@
 #
 library(nominatim)
 library(shiny)
+library(leaflet)
 source('mesowest_api.R')
 options(shiny.maxRequestSize=30*1024^2)
 options(warn =-1)
@@ -16,6 +17,7 @@ options(warn =-1)
 shinyServer(function(input, output, session) {
 
   source('mesowest_api.R')
+  
   observeEvent(
     input$stationdata,
     {
@@ -31,8 +33,33 @@ shinyServer(function(input, output, session) {
   out$end <- out$PERIOD_OF_RECORD$end
   out <- select(out, -PERIOD_OF_RECORD)
   out <- out[order(out$DISTANCE),]
+  out$LONGITUDE <- as.numeric(out$LONGITUDE)
+  out$LATITUDE <- as.numeric(out$LATITUDE)
   output$table <- renderTable(head(out,10))
   
+  output$MapPlot1 <- renderLeaflet({
+    leaflet() %>% 
+      addTiles() %>%
+     
+      setView(lng = max(out$LONGITUDE - .5), lat = min(out$LATITUDE + .5), zoom = 7)
+    
+  })
+  
+  leafIcons <- icons(
+    iconUrl = ifelse(out$STATUS =="ACTIVE",
+                     "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+                     "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"
+    ))
+  
+  observe({
+  leafletProxy("MapPlot1") %>% 
+         addTiles() %>% 
+         addMarkers(lng = out$LONGITUDE,
+                      lat = out$LATITUDE,
+                      icon = leafIcons,
+                      popup = as.character(paste("Station ID:", out$STID))
+                        )
+          })
     })
  
     observeEvent(
